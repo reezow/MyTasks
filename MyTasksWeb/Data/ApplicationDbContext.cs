@@ -8,7 +8,7 @@ namespace MyTasksWeb.Data
         {
         }
 
-        public DbSet<Tasks> Task { get; set; }
+        public DbSet<Task> Tasks { get; set; }
 
     }
 }

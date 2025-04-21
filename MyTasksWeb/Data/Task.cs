@@ -2,7 +2,7 @@
 
 namespace MyTasksWeb.Data
 {
-    public class Tasks
+    public class Task
     {
         public int Id { get; set; }
 
