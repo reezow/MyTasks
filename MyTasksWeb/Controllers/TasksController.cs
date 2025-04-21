@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyTasksWeb.Data;
+using MyTasksWeb.Models.Tasks;
 using Task = MyTasksWeb.Data.Task;
 
 namespace MyTasksWeb.Controllers
@@ -22,7 +25,14 @@ namespace MyTasksWeb.Controllers
         // GET: Tasks
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Tasks.ToListAsync());
+            var data = await _context.Tasks.ToListAsync();
+            var viewData = data.Select(t => new TaskViewModel
+            {
+                Id = t.Id,
+                Title = t.Title,
+                isCompleted = t.isCompleted,
+            });
+            return View(viewData);
         }
 
         // GET: Tasks/Details/5
@@ -40,7 +50,13 @@ namespace MyTasksWeb.Controllers
                 return NotFound();
             }
 
-            return View(task);
+            var viewModel = new TaskViewModel 
+            { 
+                Id = task.Id,
+                Title = task.Title,
+                isCompleted = task.isCompleted,
+            };
+            return View(viewModel);
         }
 
         // GET: Tasks/Create
@@ -50,19 +66,22 @@ namespace MyTasksWeb.Controllers
         }
 
         // POST: Tasks/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,isCompleted")] Task task)
+        public async Task<IActionResult> Create(TaskViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(task);
+                var viewData = new Task
+                {
+                    Title = viewModel.Title,
+                    isCompleted = viewModel.isCompleted,
+                };
+                _context.Add(viewData);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(task);
+            return View(viewModel);
         }
 
         // GET: Tasks/Edit/5
@@ -78,17 +97,22 @@ namespace MyTasksWeb.Controllers
             {
                 return NotFound();
             }
-            return View(task);
+
+            var viewModel = new TaskViewModel 
+            { 
+                Id = task.Id,
+                Title = task.Title,
+                isCompleted = task.isCompleted,
+            };
+            return View(viewModel);
         }
 
         // POST: Tasks/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,isCompleted")] Task task)
+        public async Task<IActionResult> Edit(int id, TaskViewModel viewModel)
         {
-            if (id != task.Id)
+            if (id != viewModel.Id)
             {
                 return NotFound();
             }
@@ -97,12 +121,18 @@ namespace MyTasksWeb.Controllers
             {
                 try
                 {
+                    var task = new Task
+                    {
+                        Id = viewModel.Id,
+                        Title = viewModel.Title,
+                        isCompleted = viewModel.isCompleted,
+                    };
                     _context.Update(task);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TaskExists(task.Id))
+                    if (!TaskExists(viewModel.Id))
                     {
                         return NotFound();
                     }
@@ -113,8 +143,9 @@ namespace MyTasksWeb.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(task);
+            return View(viewModel);
         }
+
 
         // GET: Tasks/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -131,7 +162,14 @@ namespace MyTasksWeb.Controllers
                 return NotFound();
             }
 
-            return View(task);
+            var viewModel = new TaskViewModel
+            {
+                Id = task.Id,
+                Title = task.Title,
+                isCompleted = task.isCompleted,
+            };
+
+            return View(viewModel);
         }
 
         // POST: Tasks/Delete/5
