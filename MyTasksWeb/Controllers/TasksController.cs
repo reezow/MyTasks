@@ -68,7 +68,7 @@ namespace MyTasksWeb.Controllers
         // POST: Tasks/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TaskViewModel viewModel)
+        public async Task<IActionResult> Create(CreateTaskViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
@@ -121,6 +121,7 @@ namespace MyTasksWeb.Controllers
             {
                 try
                 {
+                    // reverse mapping
                     var task = new Task
                     {
                         Id = viewModel.Id,
